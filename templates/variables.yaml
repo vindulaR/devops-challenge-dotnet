@@ -1,2 +1,4 @@
 variables:
   dockerImageSQL: 'mcr.microsoft.com/mssql/server:2022-latest'
+  acrSeviceConenction: 'acr-devops'
+  repositoryPath: 'dotnet/release'
