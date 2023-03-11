@@ -80,7 +80,7 @@ jobs:
   #Scan the docker container
   - template: './templates/trivy-docker-scan.yaml'
     parameters:
-      IMAGE_NAME: '***/$(repositoryPath)'
+      IMAGE_NAME: '$(containerRegistry)/$(repositoryPath)'
       IMAGE_TAG: '$(Build.BuildNumber)'
       TRIVY_VERSION: '$(trivyVersion)'
   # #If scan success, push the docker container to ACR
