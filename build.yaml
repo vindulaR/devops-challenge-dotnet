@@ -37,7 +37,13 @@ jobs:
       arguments: '--no-restore -o package'
   - script: |
       sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{ parameters.DB_ADMIN_PASSWORD }}" -p 1433:1433 --name devops-challenge --hostname devops_challenge -d $(dockerImageSQL)
-  
+      sqlcmd -S localhost -U SA -P ${{ parameters.DB_ADMIN_PASSWORD }} -q "select @@version"
+    displayName: Run SQL server and test the connectivity
+  - script: |
+      dotnet ./docker/package/DevOpsChallenege.SalesApi &
+      curl -v http://localhost:5000/
+    displayName: Run the dotnet app and test the connectivity
+
 
   
   
