@@ -9,15 +9,33 @@ parameters:
     default: latest
 
 steps:
+#Install Trivy scanner
   - script: |
       wget https://github.com/aquasecurity/trivy/releases/download/v${{ parameters.TRIVY_VERSION }}/trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
       sudo dpkg -i trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
       trivy -v
     displayName: 'Download and install Trivy'
-
+#Run a scann against new image
   - task: CmdLine@2
     displayName: "Run trivy scan"
     inputs:
       script: |
-        trivy image --exit-code 0 --severity LOW,MEDIUM ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
-        trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
+        trivy image --exit-code 0 --severity LOW,MEDIUM --format template --template "@templates/junit.tpl" -o junit-report-low-med-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}       
+        trivy image --exit-code 1--severity HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-high-crit-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
+#Bulish scan results
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/junit-report-low-med-${{ parameters.IMAGE_TAG }}.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: false
+      testRunTitle: 'Trivy - Low and Medium Vulnerabilities'
+    condition: 'always()'  
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/junit-report-high-crit-${{ parameters.IMAGE_TAG }}.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: 'Trivy - High and Critical Vulnerabilities'
+    condition: 'always()'
