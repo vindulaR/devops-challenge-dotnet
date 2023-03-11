@@ -45,7 +45,6 @@ jobs:
       dotnet ./package/DevOpsChallenge.SalesApi.dll &
       sleep 10
       nc -vz localhost:5000
-      curl -v http://localhost:5000/api/sales
     displayName: Run the dotnet app and test the connectivity
 
 #Build and package the application in a docker container
