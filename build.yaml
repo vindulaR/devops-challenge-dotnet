@@ -1,4 +1,10 @@
 #Main yaml file for CI pipeline
+
+
+#Trigger on pull requests to master branch
+pr:
+- main
+
 parameters:
   - name: DB_ADMIN_PASSWORD
     type: string
@@ -7,9 +13,6 @@ parameters:
 variables:
   - template: ./templates/variables.yaml
 
-trigger:
-  - none
-
 pool:
   vmImage: 'ubuntu-latest'
 #Build and test the dotnet source code
@@ -17,23 +20,27 @@ jobs:
 - job: Build
   displayName: Build the .net app and run tests
   steps:
+  #Setup the build environment
   - task: UseDotNet@2
     displayName: 'Use .NET Core sdk 5.0'
     inputs:
       packageType: 'sdk'
       version: '5.0.x'
       includePreviewVersions: true
+  #Install dependencies of the project
   - task: DotNetCoreCLI@2
     displayName: 'Dotnet restore dependencies'
     inputs:
       command: restore
       projects: 'docker/*.sln'
+  #Build the application
   - task: DotNetCoreCLI@2
     displayName: 'Dotnet build'
     inputs:
       command: 'build'
       projects: 'docker'
       arguments: '--no-restore -o package'
+  #Testing the application
   - script: |
       sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{ parameters.DB_ADMIN_PASSWORD }}" -p 1433:1433 --name devops-challenge --hostname devops_challenge -d $(dockerImageSQL)
       sleep 10
@@ -53,6 +60,7 @@ jobs:
   dependsOn: Build
   condition: succeeded()
   steps:
+  #Build the docker container
   - task: Docker@2
     displayName: 'Build Docker container image'
     inputs:
@@ -63,6 +71,13 @@ jobs:
       addPipelineData: false
       tags: |
          $(Build.BuildNumber)
+  #Scan the docker container
+  - template: './templates/trivy-docker-scan.yaml'
+    parameters:
+      IMAGE_NAME: '$(repositoryPath)'
+      IMAGE_TAG: '$(Build.BuildNumber)'
+      TRIVY_VERSION: '$(trivyVersion)'
+  #If scan success, push the docker container to ACR
   - task: Docker@2
     displayName: 'Push Docker container image to ACR'
     inputs:
