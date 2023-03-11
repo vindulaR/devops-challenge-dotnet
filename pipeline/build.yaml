@@ -24,12 +24,12 @@ jobs:
       includePreviewVersions: true
   - task: DotNetCoreCLI@2
     displayName: 'dotnet restore dependencies'
-    projects: '../docker/*.sln'
+    projects: '../docker'
     inputs:
       command: restore
   - task: DotNetCoreCLI@2
     displayName: 'dotnet build $(buildConfiguration)'
-    projects: '../docker/*.sln'
+    projects: '../docker'
     inputs:
       command: 'build'
       arguments: '--no-restore -o package'
