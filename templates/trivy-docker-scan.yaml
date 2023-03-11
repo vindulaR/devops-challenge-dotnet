@@ -9,15 +9,15 @@ parameters:
     default: latest
 
 steps:
-   script: |
-        wget https://github.com/aquasecurity/trivy/releases/download/v${{ parameters.TRIVY_VERSION }}/trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
-        sudo dpkg -i trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
-        trivy -v
-      displayName: 'Download and install Trivy'
+  - script: |
+      wget https://github.com/aquasecurity/trivy/releases/download/v${{ parameters.TRIVY_VERSION }}/trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
+      sudo dpkg -i trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
+      trivy -v
+    displayName: 'Download and install Trivy'
 
-    - task: CmdLine@2
-      displayName: "Run trivy scan"
-      inputs:
-        script: |
-            trivy image --exit-code 0 --severity LOW,MEDIUM {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}
-            trivy image --exit-code 1 --severity HIGH,CRITICAL {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}
+  - task: CmdLine@2
+    displayName: "Run trivy scan"
+    inputs:
+      script: |
+        trivy image --exit-code 0 --severity LOW,MEDIUM {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}
+        trivy image --exit-code 1 --severity HIGH,CRITICAL {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}
