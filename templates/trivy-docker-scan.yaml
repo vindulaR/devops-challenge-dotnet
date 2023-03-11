@@ -19,5 +19,6 @@ steps:
     displayName: "Run trivy scan"
     inputs:
       script: |
-        trivy image --exit-code 0 --severity LOW,MEDIUM {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}
-        trivy image --exit-code 1 --severity HIGH,CRITICAL {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}
+        echo "Image name {{ parameters.IMAGE_NAME }}:{{ parameters.IMAGE_TAG }}"
+        trivy image --exit-code 0 --severity LOW,MEDIUM ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
+        trivy image --exit-code 1 --severity HIGH,CRITICAL ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
