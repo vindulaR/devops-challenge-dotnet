@@ -19,23 +19,17 @@ steps:
   - task: CmdLine@2
     displayName: "Run trivy scan"
     inputs:
-      script: |
-        trivy image --exit-code 0 --severity LOW,MEDIUM --format template --template "@templates/junit.tpl" -o junit-report-low-med-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}       
-        trivy image --exit-code 1--severity HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-high-crit-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
+      script: |     
+        trivy image  --severity 1 MEDIUM,HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
 #Bulish scan results
   - task: PublishTestResults@2
     inputs:
       testResultsFormat: 'JUnit'
-      testResultsFiles: '**/junit-report-low-med-${{ parameters.IMAGE_TAG }}.xml'
-      mergeTestResults: true
-      failTaskOnFailedTests: false
-      testRunTitle: 'Trivy - Low and Medium Vulnerabilities'
-    condition: 'always()'  
-  - task: PublishTestResults@2
-    inputs:
-      testResultsFormat: 'JUnit'
-      testResultsFiles: '**/junit-report-high-crit-${{ parameters.IMAGE_TAG }}.xml'
+      testResultsFiles: '**/junit-report-${{ parameters.IMAGE_TAG }}.xml'
       mergeTestResults: true
       failTaskOnFailedTests: true
-      testRunTitle: 'Trivy - High and Critical Vulnerabilities'
+      testRunTitle: 'Trivy - Medium, High and Critical Vulnerabilities'
     condition: 'always()'
+
+#trivy image --exit-code 0 --severity LOW,MEDIUM --format template --template "@templates/junit.tpl" -o junit-report-low-med-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}       
+#trivy image --exit-code 1 --severity HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-high-crit-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
