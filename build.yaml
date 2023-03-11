@@ -1,6 +1,5 @@
 #Main yaml file for CI pipeline
 
-
 #Trigger on pull requests to master branch
 trigger: 
 - main
@@ -55,6 +54,15 @@ jobs:
       sleep 10
       nc -vz localhost 5000
     displayName: Run the dotnet app and test the connectivity
+  #Run unit testing
+  - task: DotNetCoreCLI@2
+    displayName: 'Dotnet Test'
+    inputs:
+      command: 'test'
+      projects: 'docker'
+      arguments: '--verbosity normal'
+    continueOnError: true
+
 
 #Build and package the application in a docker container
 - job: Package
@@ -73,25 +81,21 @@ jobs:
       addPipelineData: false
       tags: |
          $(Build.BuildNumber)
-  #Debug the image name issue
-  - script: |
-      docker image ls
-    displayName: Debug the image name
   #Scan the docker container
   - template: './templates/trivy-docker-scan.yaml'
     parameters:
       IMAGE_NAME: '$(containerRegistry)/$(repositoryPath)'
       IMAGE_TAG: '$(Build.BuildNumber)'
       TRIVY_VERSION: '$(trivyVersion)'
-  # #If scan success, push the docker container to ACR
-  # - task: Docker@2
-  #   displayName: 'Push Docker container image to ACR'
-  #   inputs:
-  #     containerRegistry: $(acrSeviceConenction)
-  #     repository: '$(repositoryPath)'
-  #     command: push
-  #     tags: |
-  #         $(Build.BuildNumber)
+  #If scan success, push the docker container to ACR
+  - task: Docker@2
+    displayName: 'Push Docker container image to ACR'
+    inputs:
+      containerRegistry: $(acrSeviceConenction)
+      repository: '$(repositoryPath)'
+      command: push
+      tags: |
+          $(Build.BuildNumber)
   
     
   
