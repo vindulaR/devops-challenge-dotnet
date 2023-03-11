@@ -41,10 +41,10 @@ jobs:
       sqlcmd -S localhost -U sa -P ${{ parameters.DB_ADMIN_PASSWORD }} -Q "select @@version;"
     displayName: Run SQL server and test the connectivity
   - script: |
-      export CONNECTIONSTRINGS__DATABASE="Server=localhost;Database=test;User Id=sa;Password=Tf7avwNM@Ad3YFSI58L"
+      export CONNECTIONSTRINGS__DATABASE="Server=localhost;Database=test;User Id=sa;Password=${{ parameters.DB_ADMIN_PASSWORD }}"
       dotnet ./package/DevOpsChallenge.SalesApi.dll &
       sleep 10
-      nc -vz localhost:5000
+      nc -vz localhost 5000
     displayName: Run the dotnet app and test the connectivity
 
 #Build and package the application in a docker container
