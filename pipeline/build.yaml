@@ -1,1 +1,43 @@
 #Main yaml file
+parameters:
+  - name: DB_ADMIN_PASSWORD
+    type: string
+
+variables:
+  - template: ./variables.yaml
+
+trigger:
+  - none
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+jobs:
+- job: 
+  displayName: Build the .net app and run tests
+  steps:
+  - task: UseDotNet@2
+    displayName: 'Use .NET Core sdk 5.0'
+    inputs:
+      packageType: 'sdk'
+      version: '5.0.x'
+      includePreviewVersions: true
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet restore dependencies'
+    projects: '../docker/*.sln'
+    inputs:
+      command: restore
+  - task: DotNetCoreCLI@2
+    displayName: 'dotnet build $(buildConfiguration)'
+    projects: '../docker/*.sln'
+    inputs:
+      command: 'build'
+      arguments: '--no-restore -o package'
+  - script: |
+      sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{ parameters.DB_ADMIN_PASSWORD }}" -p 1433:1433 --name devops-challenge --hostname devops_challenge -d $(dockerImageSQL)
+  
+
+  
+  
+    
+  
