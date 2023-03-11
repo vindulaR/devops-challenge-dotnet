@@ -4,7 +4,7 @@ parameters:
     type: string
 
 variables:
-  - template: ./variables.yaml
+  - template: ./templates/variables.yaml
 
 trigger:
   - none
@@ -22,16 +22,18 @@ jobs:
       packageType: 'sdk'
       version: '5.0.x'
       includePreviewVersions: true
+  - script: |
+      ls -l
   - task: DotNetCoreCLI@2
     displayName: 'dotnet restore dependencies'
     inputs:
       command: restore
-      projects: '$(Build.SourcesDirectory)/../docker/*'
+      projects: 'docker/*'
   - task: DotNetCoreCLI@2
     displayName: 'dotnet build $(buildConfiguration)'
     inputs:
       command: 'build'
-      projects: '$(Build.SourcesDirectory)/../docker/*'
+      projects: 'docker/*'
       arguments: '--no-restore -o package'
   - script: |
       sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=${{ parameters.DB_ADMIN_PASSWORD }}" -p 1433:1433 --name devops-challenge --hostname devops_challenge -d $(dockerImageSQL)
