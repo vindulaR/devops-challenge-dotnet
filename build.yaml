@@ -41,6 +41,7 @@ jobs:
       sqlcmd -S localhost -U sa -P ${{ parameters.DB_ADMIN_PASSWORD }} -Q "select @@version;"
     displayName: Run SQL server and test the connectivity
   - script: |
+      ls -l
       dotnet ./docker/package/DevOpsChallenege.SalesApi.dll &
       sleep 10
       curl -v http://localhost:5000/
