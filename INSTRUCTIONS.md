@@ -62,14 +62,13 @@ dotnet test --verbosity normal
 ### Automate using the CI Pipeline
 1. Pipeline definition can be found in `build-pipeline.yaml` in root directory.
 2. Create a new pipeline with Azure DevOPs. 
-```
 a. Select Github from connect step.
 b. Select the relevant repository from the Select step.
 c. Select  the option `Existing Azure Pipeline YAML file` from configure step. And provide the branch and the pipeline definition YAML file from the menu.
 d. Run the  pipeline
-```
+
 3. When doing a new code change, create a new branch from the main branch do the changes and create a pull request to main branch.
- 
+
 
 ## Reference
 1. https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-linux-ver15&preserve-view=true&pivots=cs1-bash#pullandrun2019
