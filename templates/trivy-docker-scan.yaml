@@ -20,7 +20,7 @@ steps:
     displayName: "Run trivy scan"
     inputs:
       script: |     
-        trivy image --exit-code 0 --severity MEDIUM,HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
+        trivy image --exit-code 1 --severity MEDIUM,HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
 #publish scan results
   - task: PublishTestResults@2
     inputs:

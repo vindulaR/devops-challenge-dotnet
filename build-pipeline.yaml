@@ -1,8 +1,7 @@
 #Main yaml file for CI pipeline
 
 #Trigger on pull requests to master branch
-trigger: 
-- main
+trigger: none
 pr:
 - main
 
