@@ -13,7 +13,7 @@
 3. Disable direct push to main branch of the repository.
 
 ## Directory structure
-**1. Base direcctory**
+**1. Base directory**
 ```
 .
 ├── build-pipeline.yaml
