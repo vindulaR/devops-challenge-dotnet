@@ -1,0 +1,35 @@
+parameters:
+  - name: IMAGE_NAME
+    type: string
+  - name: IMAGE_TAG
+    type: string
+    default: latest
+  - name: TRIVY_VERSION
+    type: string
+    default: latest
+
+steps:
+#Install Trivy scanner
+  - script: |
+      wget https://github.com/aquasecurity/trivy/releases/download/v${{ parameters.TRIVY_VERSION }}/trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
+      sudo dpkg -i trivy_${{ parameters.TRIVY_VERSION }}_Linux-64bit.deb
+      trivy -v
+    displayName: 'Download and install Trivy'
+#Run a scann against new image
+  - task: CmdLine@2
+    displayName: "Run trivy scan"
+    inputs:
+      script: |     
+        trivy image --exit-code 1 --severity MEDIUM,HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
+#publish scan results
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'JUnit'
+      testResultsFiles: '**/junit-report-${{ parameters.IMAGE_TAG }}.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: false
+      testRunTitle: 'Trivy - Medium, High and Critical Vulnerabilities'
+    condition: 'always()'
+
+#trivy image --exit-code 0 --severity LOW,MEDIUM --format template --template "@templates/junit.tpl" -o junit-report-low-med-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}       
+#trivy image --exit-code 1 --severity HIGH,CRITICAL --format template --template "@templates/junit.tpl" -o junit-report-high-crit-${{ parameters.IMAGE_TAG }}.xml ${{ parameters.IMAGE_NAME }}:${{ parameters.IMAGE_TAG }}
