@@ -3,7 +3,14 @@
 #Trigger on pull requests to master branch
 trigger: none
 pr:
-- main
+  branches:
+    include:
+    - main
+  paths:
+    exclude:
+    - README.md
+    - INSTRUCTIONS.md
+    - LICENSE
 
 parameters:
   - name: DB_ADMIN_PASSWORD
