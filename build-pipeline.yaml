@@ -9,7 +9,7 @@ pr:
   paths:
     exclude:
     - README.md
-    - INSTRUCTIONS.md
+    - README_ORIGINAL.md
     - LICENSE
 
 parameters:

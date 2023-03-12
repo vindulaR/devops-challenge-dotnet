@@ -1,69 +1,79 @@
-# DevOps Challenge (.NET)
+# Getting started guide
 
-## Introduction :wave:
+## Tools and Technologies
+* Azure Container registry (Free tier)
+* Azure DevOps (Free tier)
+* Github 
+* Docker
+* Dotnet 5.0 SDK
 
-This challenge utilises the broad range of skills required by a DevOps Engineer. It focuses on DevOps for a .NET 5 application.
+## Prerequisites
+1. Access to ACR from Azure DevOps project.
+2. Create service connections from Azure DevOps project to Github and ACR.
+3. Disable direct push to main branch of the repository.
 
-In completing the challenge, you're welcome to change all aspects of the initial repository, including:
-* Directory and file structure.
-* Solution and project names.
-* Namespaces and class names.
-* Code, data, and settings files.
-* NuGet packages and dependencies.
-* This README!
+## Directory structure
+**1. Base directory**
+```
+.
+├── build-pipeline.yaml
+├── docker
+├── INSTRUCTIONS.md
+├── LICENSE
+├── README.md
+└── templates
+```
+**2. Directory contains source code and docker file**
+```
+docker
+├── DevOpsChallenge.SalesApi.sln
+├── Dockerfile
+├── src
+└── tests
+```
+**3. Directory contains template files for Azure DevOps pipeline**
+```
+templates
+├── junit.tpl
+├── trivy-docker-scan.yaml
+└── variables.yaml 
+```
 
-The solution should represent best practices, even if the starting solution is lacking them.
+## Steps to follow
+### Test the app locally
+1. Run SQL in a docker container.
+```
+sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=<your_password>" -p 1433:1433 --name devops-challenge --hostname devops_challenge -d mcr.microsoft.com/mssql/server:2022-latest
+```
+2. Go to the dotnet project directory and install the dependencies and, build the code.
+```
+dotnet restore
+dotnet build --no-restore -o sample
+```
+3. Run the application in output directory.
+```
+dotnet ./sample/DevOpsChallenge.SalesApi.dll
+```
+4. Run the test suite
+```
+dotnet test --verbosity normal
+```
 
-You'll need .NET 5 and SQL Server Local DB to build and run the application locally. On a Mac or Linux device, you can update the connection string (in `appsettings.Development.json` and `DatabaseContextDesignTimeFactory.cs`) and use Docker to launch SQL Server Developer Edition.
+### Automate using the CI Pipeline
+1. Pipeline definition can be found in `build-pipeline.yaml` in root directory.
+2. Create a new pipeline with Azure DevOPs. 
+   - Select Github from connect step.
+   - Select the relevant repository from the Select step.
+   - Select  the option `Existing Azure Pipeline YAML file` from configure step. And provide the branch and the pipeline definition YAML file from the menu.
+   - Run the  pipeline
 
-## Scenario :blue_book:
+3. When doing a new code change, create a new branch from the main branch do the changes and create a pull request to main branch.
 
-You're a DevOps Engineer working in a small team to launch a new application. The management team will use the new application to view and report on daily sales data.
 
-The development team have built a new API to ingest sales data from an existing system and provide endpoints for viewing and reporting the data. A future application will provide a user interface.
-
-*Note: For simplicity of the solution, the API does not require authentication. Don't do this in a real application!*
-
-## Challenge :question:
-
-You should:
-
-1. Introduce best practices into the solution to ensure a high-quality deliverable and a great developer experience.
-
-2. Build and package the application as a container in a CI/CD pipeline ready for deployment
-
-You'll need to select a CI/CD tool to complete the challenge. Feel free to use your preferred platform, such as GitHub Actions, Azure Pipelines, Circle CI, or Travis CI.
-
-*Note: This challenge does NOT require infrastructure provisioning or deployment. This challenge has designed to be possible without incurring any licencing, hosting or tooling costs.*
-
-## Opportunities (optional) :zap:
-
-You've received feedback on the application from members of the project team. Optionally, fix these issues, or provide instructions back to the developer on the next steps to take:
-
-1. The front end developer consuming the Sales API has mentioned the Swagger UI interface doesn't contain descriptions of operations, parameters, or responses. The Swagger UI interface should display the code comments written by the API developer.
-
-2. The security team have identified the application is revealing the technology used by sending the response header `Server: Kestrel`. This header should not be present in responses sent by the server.
-
-3. The database administrator has identified poor query performance when a sale record is retrieved using its transaction ID. They have recommended creating an index.
-
-## Effort :clock5:
-
-Spend as much or as little time as you like on this challenge. DevOps Engineers wear many hats :crown:, and there's always more opportunity for change and improvement. **Limit yourself to the time you have. Make the changes that deliver the most value.**
-
-If you're looking for inspiration of changes to make, consider:
-
-* Getting started documentation for a new developer.
-* Configuring Git's behaviour for particular files.
-* Versioning of artifacts.
-* Linting and code quality analysis.
-* Scanning for code vulnerabilities.
-* Running unit tests.
-* Assessing code coverage.
-* Indexing PDBs for debugging in a deployed environment.
-* Preparing to run integration tests on a deployed environment.
-* Preparing to deploy database schema migrations.
-* Generating a client for the API.
-
-There's always more to learn and do. **You don't need to do all of these to demonstrate your ability.** This list is a suggestion of ideas. You're welcome to do something else.
-
-Be kind to yourself, and enjoy the challenge. :heart:
+## Reference
+1. https://learn.microsoft.com/en-us/sql/linux/quickstart-install-connect-docker?view=sql-server-linux-ver15&preserve-view=true&pivots=cs1-bash#pullandrun2019
+2. https://docs.docker.com/language/dotnet/build-images/
+3. https://docs.docker.com/language/dotnet/run-containers/
+4. https://learn.microsoft.com/en-us/azure/devops/pipelines/ecosystems/containers/acr-template?view=azure-devops
+5. https://learn.microsoft.com/en-us/azure/devops/pipelines/ecosystems/dotnet-core?view=azure-devops&tabs=dotnetfive
+6. https://lgulliver.github.io/trivy-scan-results-to-azure-devops/
