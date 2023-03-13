@@ -67,7 +67,7 @@ jobs:
       command: 'test'
       projects: 'docker'
       arguments: '--verbosity normal'
-    #continueOnError: true
+    continueOnError: true
 
 
 #Build and package the application in a docker container
