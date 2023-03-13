@@ -45,16 +45,20 @@ templates
 ```
 sudo docker run -e "ACCEPT_EULA=Y" -e "MSSQL_SA_PASSWORD=<your_password>" -p 1433:1433 --name devops-challenge --hostname devops_challenge -d mcr.microsoft.com/mssql/server:2022-latest
 ```
-2. Go to the dotnet project directory and install the dependencies and, build the code.
+2. Set the environment variable for DB connection string.
+```
+export CONNECTIONSTRINGS__DATABASE="Server=localhost;Database=<db_name>;User Id=<user_name>;Password=<password>"
+```
+3. Go to the dotnet project directory and install the dependencies and, build the code.
 ```
 dotnet restore
 dotnet build --no-restore -o sample
 ```
-3. Run the application in output directory.
+4. Run the application in output directory.
 ```
 dotnet ./sample/DevOpsChallenge.SalesApi.dll
 ```
-4. Run the test suite
+5. Run the test suite
 ```
 dotnet test --verbosity normal
 ```
